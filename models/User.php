@@ -16,4 +16,6 @@ class User
 interface UserDAO
 {
     public function findByToken(String $token);
+    public function findByEmail(String $email);
+    public function update(User $user);
 }

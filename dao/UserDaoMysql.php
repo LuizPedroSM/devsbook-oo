@@ -14,6 +14,7 @@ class UserDaoMysql implements UserDAO
     {
         $u = new User();
         $u->id = $array['id'] ?? 0;
+        $u->password = $array['password'] ?? 0;
         $u->email = $array['email'] ?? '';
         $u->name = $array['name'] ?? '';
         $u->birthdate = $array['birthdate'] ?? '';
@@ -25,7 +26,7 @@ class UserDaoMysql implements UserDAO
         return $u;
     }
 
-    public function findByToken($token)
+    public function findByToken(String $token)
     {
         if (!empty($token)) {
             $sql = $this->pdo->prepare("SELECT * FROM users WHERE token = :token");
@@ -38,5 +39,48 @@ class UserDaoMysql implements UserDAO
             }
         }
         return false;
+    }
+
+    public function findByEmail(String $email)
+    {
+        if (!empty($email)) {
+            $sql = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
+            $sql->bindValue(':email', $email);
+            $sql->execute();
+            if ($sql->rowCount() > 0) {
+                $data = $sql->fetch(PDO::FETCH_ASSOC);
+                $user = $this->generateUser($data);
+                return $user;
+            }
+        }
+        return false;
+    }
+
+    public function update(User $user)
+    {
+        $sql = $this->pdo->prepare("UPDATE users SET
+            email = :email,
+            password = :password,
+            name = :name,
+            birthdate = :birthdate,
+            city = :city,
+            work = :work,
+            avatar = :avatar,
+            cover = :cover,
+            token = :token
+            WHERE id = :id
+        ");
+        $sql->bindValue(':email', $user->email);
+        $sql->bindValue(':password', $user->password);
+        $sql->bindValue(':name', $user->name);
+        $sql->bindValue(':birthdate', $user->birthdate);
+        $sql->bindValue(':city', $user->city);
+        $sql->bindValue(':work', $user->work);
+        $sql->bindValue(':avatar', $user->avatar);
+        $sql->bindValue(':cover', $user->cover);
+        $sql->bindValue(':token', $user->token);
+        $sql->bindValue(':id', $user->id);
+        $sql->execute();
+        return true;
     }
 }
