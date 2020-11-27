@@ -6,7 +6,7 @@ class Auth
     private $pdo;
     private $base;
 
-    public function __construct(PDO $pdo, String $base)
+    public function __construct(PDO $pdo, string $base)
     {
         $this->pdo = $pdo;
         $this->base = $base;
@@ -26,12 +26,12 @@ class Auth
     }
 
 
-    private static function tokenGenerator()
+    private static function tokenGenerator(): string
     {
         return md5(time() . rand(0, 9999)) . time();
     }
 
-    public function validateLogin(String $email, String $password)
+    public function validateLogin(string $email, string $password): bool
     {
         $userDao = new UserDaoMysql($this->pdo);
         $user = $userDao->findByEmail($email);
@@ -48,5 +48,30 @@ class Auth
             }
         }
         return false;
+    }
+
+    public function emailExists(string $email): bool
+    {
+        $userDao = new UserDaoMysql($this->pdo);
+        return $userDao->findByEmail($email) ? true : false;
+    }
+
+    public function registerUser(string $name, string $email, string $birthdate, string $password): void
+    {
+        $userDao = new UserDaoMysql($this->pdo);
+
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $token = $this->tokenGenerator();
+
+        $newUser = new User();
+        $newUser->name = $name;
+        $newUser->email = $email;
+        $newUser->birthdate = $birthdate;
+        $newUser->password = $hash;
+        $newUser->token = $token;
+
+        $userDao->insert($newUser);
+
+        $_SESSION['token'] = $token;
     }
 }

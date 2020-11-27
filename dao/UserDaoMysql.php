@@ -10,7 +10,7 @@ class UserDaoMysql implements UserDAO
         $this->pdo = $driver;
     }
 
-    private function generateUser($array): User
+    private function generateUser(array $array): User
     {
         $u = new User();
         $u->id = $array['id'] ?? 0;
@@ -26,7 +26,7 @@ class UserDaoMysql implements UserDAO
         return $u;
     }
 
-    public function findByToken(String $token)
+    public function findByToken(string $token)
     {
         if (!empty($token)) {
             $sql = $this->pdo->prepare("SELECT * FROM users WHERE token = :token");
@@ -41,7 +41,7 @@ class UserDaoMysql implements UserDAO
         return false;
     }
 
-    public function findByEmail(String $email)
+    public function findByEmail(string $email)
     {
         if (!empty($email)) {
             $sql = $this->pdo->prepare("SELECT * FROM users WHERE email = :email");
@@ -56,7 +56,7 @@ class UserDaoMysql implements UserDAO
         return false;
     }
 
-    public function update(User $user)
+    public function update(User $user): bool
     {
         $sql = $this->pdo->prepare("UPDATE users SET
             email = :email,
@@ -81,6 +81,23 @@ class UserDaoMysql implements UserDAO
         $sql->bindValue(':token', $user->token);
         $sql->bindValue(':id', $user->id);
         $sql->execute();
+        return true;
+    }
+
+    public function insert(User $user): bool
+    {
+        $sql = $this->pdo->prepare("INSERT INTO users (
+                email, password, name, birthdate, token
+            ) VALUES (
+                :email, :password, :name, :birthdate, :token
+        )");
+        $sql->bindValue(':name', $user->name);
+        $sql->bindValue(':email', $user->email);
+        $sql->bindValue(':birthdate', $user->birthdate);
+        $sql->bindValue(':password', $user->password);
+        $sql->bindValue(':token', $user->token);
+        $sql->execute();
+
         return true;
     }
 }
