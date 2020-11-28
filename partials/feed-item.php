@@ -13,12 +13,12 @@ switch ($item->type) {
     <div class="box-body">
         <div class="feed-item-head row mt-20 m-width-20">
             <div class="feed-item-head-photo">
-                <a href="<?= $base; ?>/profile.php=<?= $item->id_user; ?>">
+                <a href="<?= $base; ?>/profile.php?id=<?= $item->id_user; ?>">
                     <img src="<?= $base; ?>/media/avatars/<?= $item->user->avatar; ?>" />
                 </a>
             </div>
             <div class="feed-item-head-info">
-                <a href="<?= $base; ?>/profile.php=<?= $item->id_user; ?>"><span
+                <a href="<?= $base; ?>/profile.php?id=<?= $item->id_user; ?>"><span
                         class="feed-name"><?= $item->user->name; ?></span></a>
                 <span class="feed-action"><?= $actionPhrase ?></span>
                 <br />

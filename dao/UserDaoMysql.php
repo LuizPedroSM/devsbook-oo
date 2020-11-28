@@ -1,5 +1,6 @@
 <?php
 require_once './models/User.php';
+require_once './dao/UserRelationDaoMysql.php';
 
 class UserDaoMysql implements UserDAO
 {
@@ -10,7 +11,7 @@ class UserDaoMysql implements UserDAO
         $this->pdo = $driver;
     }
 
-    private function generateUser(array $array): User
+    private function generateUser(array $array, bool $full = false): User
     {
         $u = new User();
         $u->id = $array['id'] ?? 0;
@@ -23,6 +24,27 @@ class UserDaoMysql implements UserDAO
         $u->avatar = $array['avatar'] ?? '';
         $u->cover = $array['cover'] ?? '';
         $u->token = $array['token'] ?? '';
+
+        if ($full) {
+            $userRelationDao = new UserRelationDaoMysql($this->pdo);
+            $postDao = new PostDaoMysql($this->pdo);
+            // Followers = Quem segue o usuário
+            $u->followers = $userRelationDao->getFollowers($u->id);
+            foreach ($u->followers as $key => $follower_id) {
+                $newUser = $this->findById($follower_id);
+                $u->followers[$key] = $newUser;
+            }
+
+            // Following = Quem o usuário segue
+            $u->following = $userRelationDao->getFollowing($u->id);
+            foreach ($u->following as $key => $following_id) {
+                $newUser = $this->findById($following_id);
+                $u->following[$key] = $newUser;
+            }
+            // Photos
+            
+            $u->photos = $postDao->getPhotosFrom($u->id);
+        }
         return $u;
     }
 
@@ -56,7 +78,7 @@ class UserDaoMysql implements UserDAO
         return false;
     }
 
-    public function findById(int $id)
+    public function findById(?int $id, bool $full = false)
     {
         if (!empty($id)) {
             $sql = $this->pdo->prepare("SELECT * FROM users WHERE id = :id");
@@ -64,7 +86,7 @@ class UserDaoMysql implements UserDAO
             $sql->execute();
             if ($sql->rowCount() > 0) {
                 $data = $sql->fetch(PDO::FETCH_ASSOC);
-                $user = $this->generateUser($data);
+                $user = $this->generateUser($data, $full);
                 return $user;
             }
         }
