@@ -1,5 +1,5 @@
 <script>
-    window.onload = async function () {
+    window.onload = async function() {
         document.querySelectorAll(".like-btn").forEach(item => {
             item.addEventListener("click", async () => {
                 let id = item.closest(".feed-item").getAttribute("data-id");
@@ -11,9 +11,47 @@
                     item.classList.remove("on");
                     item.innerText = --count;
                 }
-
                 await fetch("ajax_like.php?id=" + id);
             });
         });
+
+
+        document.querySelectorAll('.fic-item-field').forEach(item => {
+            item.addEventListener('keyup', async (e) => {
+                if (e.keyCode == 13) {
+                    let id = item.closest('.feed-item').getAttribute('data-id');
+                    let txt = item.value;
+                    item.value = '';
+
+                    let data = new FormData();
+                    data.append('id', id);
+                    data.append('txt', txt);
+
+                    let req = await fetch('ajax_comment.php', {
+                        method: 'POST',
+                        body: data
+                    });
+                    let json = await req.json();
+
+                    if (json.error == '') {
+                        let html = '<div class="fic-item row m-height-10 m-width-20">';
+                        html += '<div class="fic-item-photo">';
+                        html += '<a href="' + json.link + '"><img src="' + json.avatar + '" /></a>';
+                        html += '</div>';
+                        html += '<div class="fic-item-info">';
+                        html += '<a href="' + json.link + '">' + json.name + '</a>';
+                        html += json.body;
+                        html += '</div>';
+                        html += '</div>';
+
+                        item.closest('.feed-item')
+                            .querySelector('.feed-item-comments-area')
+                            .innerHTML += html;
+                    }
+
+                }
+            });
+        });
+
     }
 </script>

@@ -11,7 +11,7 @@ switch ($item->type) {
         break;
 }
 ?>
-<div class="box feed-item" data-id="<?= $item->id?>">
+<div class="box feed-item" data-id="<?= $item->id ?>">
     <div class="box-body">
         <div class="feed-item-head row mt-20 m-width-20">
             <div class="feed-item-head-photo">
@@ -20,8 +20,7 @@ switch ($item->type) {
                 </a>
             </div>
             <div class="feed-item-head-info">
-                <a href="<?= $base; ?>/profile.php?id=<?= $item->id_user; ?>"><span
-                        class="feed-name"><?= $item->user->name; ?></span></a>
+                <a href="<?= $base; ?>/profile.php?id=<?= $item->id_user; ?>"><span class="feed-name"><?= $item->user->name; ?></span></a>
                 <span class="feed-action"><?= $actionPhrase ?></span>
                 <br />
                 <span class="feed-date"><?= date('h:i:s d/m/Y', strtotime($item->created_at)); ?></span>
@@ -39,20 +38,23 @@ switch ($item->type) {
         </div>
         <div class="feed-item-comments">
 
-            <!-- <div class="fic-item row m-height-10 m-width-20">
-                <div class="fic-item-photo">
-                    <a href=""><img src="media/avatars/avatar.jpg" /></a>
-                </div>
-                <div class="fic-item-info">
-                    <a href="">Bonieky Lacerda</a>
-                    Comentando no meu próprio post
-                </div>
-            </div> -->
+            <div class="feed-item-comments-area">
+                <?php foreach ($item->comments as $comment) : ?>
+                    <div class="fic-item row m-height-10 m-width-20">
+                        <div class="fic-item-photo">
+                            <a href="<?= $base; ?>/profile.php?id=<?= $comment->id_user; ?>"><img src="<?= $base; ?>/media/avatars/<?= $comment->user->avatar; ?>" /></a>
+                        </div>
+                        <div class="fic-item-info">
+                            <a href="<?= $base; ?>/profile.php?id=<?= $comment->id_user; ?>"><?= $comment->user->name; ?></a>
+                            <?= $comment->body; ?>
+                        </div>
+                    </div>
+                <?php endforeach; ?>
+            </div>
 
             <div class="fic-answer row m-height-10 m-width-20">
                 <div class="fic-item-photo">
-                    <a href="<?= $base; ?>/profile.php"><img
-                            src="<?= $base; ?>/media/avatars/<?= $userInfo->avatar; ?>" /></a>
+                    <a href="<?= $base; ?>/profile.php"><img src="<?= $base; ?>/media/avatars/<?= $userInfo->avatar; ?>" /></a>
                 </div>
                 <input type="text" class="fic-item-field" placeholder="Escreva um comentário" />
             </div>
