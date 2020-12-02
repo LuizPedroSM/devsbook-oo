@@ -109,6 +109,9 @@ if ($name && $email) {
             }
    
             $userInfo->avatar = cutImage($newAvatar, $avatarWidth, $avatarHeight, $folder);
+        } else {
+            $_SESSION['flash'] = 'Arquivo não suportado (jpg ou png)';
+            exit(header("Location: " . $base . "/settings.php"));
         }
     }
     // Cover
@@ -128,6 +131,9 @@ if ($name && $email) {
             }
 
             $userInfo->cover = cutImage($newCover, $coverWidth, $coverHeight, $folder);
+        } else {
+            $_SESSION['flash'] = 'Arquivo não suportado (jpg ou png)';
+            exit(header("Location: " . $base . "/settings.php"));
         }
     }
 
