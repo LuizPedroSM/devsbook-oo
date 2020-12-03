@@ -1,5 +1,6 @@
 <script>
-    window.onload = async function() {
+    window.addEventListener('load', function() {
+
         document.querySelectorAll(".like-btn").forEach(item => {
             item.addEventListener("click", async () => {
                 let id = item.closest(".feed-item").getAttribute("data-id");
@@ -72,5 +73,5 @@
             });
         });
 
-    }
+    })
 </script>
