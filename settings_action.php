@@ -89,8 +89,10 @@ if ($name && $email) {
     $userInfo->city = $city;
     $userInfo->work = $work;
 
-    $hash = password_hash($password, PASSWORD_DEFAULT);
-    $userInfo->password = $hash;
+    if ($password) {        
+        $hash = password_hash($password, PASSWORD_DEFAULT);
+        $userInfo->password = $hash;
+    }
 
     // Avatar
     if (isset($_FILES['avatar']) && !empty($_FILES['avatar']['tmp_name'])) {
