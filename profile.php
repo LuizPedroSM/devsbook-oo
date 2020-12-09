@@ -29,7 +29,7 @@ $dateTo = new DateTime('today');
 $user->ageYears = $dateFrom->diff($dateTo)->y;
 
 // Pegar Feed do Usuário;
-$info = $postDao->getUserFeed($id, $page);
+$info = $postDao->getUserFeed($id, $page , $userInfo->id);
 $feed = $info['feed'];
 $pages = $info['pages'];
 $currentPage = $info['currentPage'];

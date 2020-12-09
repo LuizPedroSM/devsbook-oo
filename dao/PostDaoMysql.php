@@ -13,7 +13,7 @@ class PostDaoMysql implements PostDAO
         $this->pdo = $driver;
     }
 
-    private function _postListToObject(array $post_list, $id_user): array
+    private function _postListToObject(array $post_list, $id_user, $logged_user): array
     {
         $userDao = new UserDaoMysql($this->pdo);
         $postLikeDao = new PostLikeDaoMysql($this->pdo);
@@ -28,7 +28,7 @@ class PostDaoMysql implements PostDAO
             $newPost->body = $post_item['body'];
             $newPost->mine = false;
 
-            if ($post_item['id_user'] == $id_user) {
+            if ($post_item['id_user'] == $logged_user) {
                 $newPost->mine = true;
             }
 
@@ -38,7 +38,7 @@ class PostDaoMysql implements PostDAO
             // Info sobre LIKE
 
             $newPost->likeCount = $postLikeDao->getLikeCount($newPost->id);
-            $newPost->liked = $postLikeDao->isLiked($newPost->id, $id_user);
+            $newPost->liked = $postLikeDao->isLiked($newPost->id, $logged_user);
 
             // Info sobre Comments
             $newPost->comments = $postCommentDao->getComments($newPost->id);
@@ -95,7 +95,7 @@ class PostDaoMysql implements PostDAO
         }
     }
 
-    public function getHomeFeed($id_user, $page = 1): array
+    public function getHomeFeed($id_user, $page = 1, $logged_user): array
     {
         $array = ['feed' => []];
         $perPage = 5;
@@ -113,7 +113,7 @@ class PostDaoMysql implements PostDAO
         if ($sql->rowCount() > 0) {
             $post_list = $sql->fetchAll(PDO::FETCH_ASSOC);
             // 3. Transformar o resultado em objetos.
-            $array['feed'] = $this->_postListToObject($post_list, $id_user);
+            $array['feed'] = $this->_postListToObject($post_list, $id_user, $logged_user);
         }
         // 4. Pegar o numero Total de posts
         $sql = $this->pdo->query("SELECT COUNT(*) as c FROM posts
@@ -126,7 +126,7 @@ class PostDaoMysql implements PostDAO
         return $array ?? [];
     }
 
-    public function getUserFeed($id_user, $page = 1): array
+    public function getUserFeed($id_user, $page = 1, $logged_user): array
     {
         $array = ['feed' => []];
         $perPage = 5;
@@ -142,7 +142,7 @@ class PostDaoMysql implements PostDAO
         if ($sql->rowCount() > 0) {
             $post_list = $sql->fetchAll(PDO::FETCH_ASSOC);
             // 2. Transformar o resultado em objetos.
-            $array['feed'] = $this->_postListToObject($post_list, $id_user);
+            $array['feed'] = $this->_postListToObject($post_list, $id_user, $logged_user);
         }
         // 3. Pegar o numero Total de posts
         $sql = $this->pdo->prepare("SELECT COUNT(*) as c FROM posts WHERE id_user = :id_user");
@@ -158,7 +158,7 @@ class PostDaoMysql implements PostDAO
         return $array;
     }
 
-    public function getPhotosFrom($id_user)
+    public function getPhotosFrom($id_user, $logged_user)
     {
         $sql = $this->pdo->prepare("SELECT * FROM posts
         WHERE id_user = :id_user AND type = 'photo'
@@ -168,7 +168,7 @@ class PostDaoMysql implements PostDAO
 
         if ($sql->rowCount() > 0) {
             $post_list = $sql->fetchAll(PDO::FETCH_ASSOC);
-            $array = $this->_postListToObject($post_list, $id_user);
+            $array = $this->_postListToObject($post_list, $id_user, $logged_user);
         }
 
         return $array ?? [];

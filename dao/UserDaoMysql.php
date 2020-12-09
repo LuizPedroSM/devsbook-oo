@@ -43,7 +43,7 @@ class UserDaoMysql implements UserDAO
             }
             // Photos
             
-            $u->photos = $postDao->getPhotosFrom($u->id);
+            $u->photos = $postDao->getPhotosFrom($u->id, $u->id);
         }
         return $u;
     }
